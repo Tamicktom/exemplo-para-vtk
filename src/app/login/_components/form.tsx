@@ -13,26 +13,54 @@ import { Label } from "@/components/ui/label";
 //* Utils imports
 import { api } from "@/utils/public-api";
 
-const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
-});
+//* Hooks imports
+import { useLogin, type Login, loginSchema } from "../_hooks";
 
-type Login = z.infer<typeof loginSchema>;
+// const loginSchema = z.object({
+//   email: z.string().email(),
+//   password: z.string().min(6),
+// });
+
+// type Login = z.infer<typeof loginSchema>;
+
+// const apiResponseSchema = z.object({
+//   data: z.string(),
+//   path: z.literal("/auth/login"),
+// });
+
+// type ApiResponse = z.infer<typeof apiResponseSchema>;
+
+// async function login(data: Login): Promise<ApiResponse | Error> {
+//   const response = await api.safePost({
+//     url: "/auth/login",
+//     body: data,
+//     schema: apiResponseSchema,
+//   });
+
+//   if (response.success) {
+//     return response.data;
+//   }
+
+//   throw new Error("Error");
+// }
 
 export function Form() {
+  const login = useLogin();
+
   const form = useForm<Login>({
     resolver: zodResolver(loginSchema),
   });
 
-  const onSubmit = form.handleSubmit(async (data: Login) => {
-    const response = await api.post({
-      url: "/auth/login",
-      body: data,
-      schema: z.any(),
-    });
+  const onSubmit = form.handleSubmit((data: Login) => {
+    // const response = await api.post({
+    //   url: "/auth/login",
+    //   body: data,
+    //   schema: z.any(),
+    // });
 
-    console.log(response);
+    // console.log(response);
+
+    login.mutate(data);
   });
 
   return (
