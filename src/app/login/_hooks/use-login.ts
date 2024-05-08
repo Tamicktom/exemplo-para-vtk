@@ -4,11 +4,12 @@ import { useMutation } from "@tanstack/react-query";
 import z from "zod";
 
 //* Utils imports
+import { emailSchema, passwordSchema } from "@/schemas";
 import { api } from "@/utils/public-api";
 
 export const loginSchema = z.object({
-  email: z.string().email(),
-  password: z.string().min(6),
+  email: emailSchema,
+  password: passwordSchema,
 });
 
 export type Login = z.infer<typeof loginSchema>;
