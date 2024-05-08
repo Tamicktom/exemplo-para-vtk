@@ -1,17 +1,13 @@
 "use client";
 //* Libraries imports
-import { useMutation } from "@tanstack/react-query";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import z from "zod";
+import { useToast } from "@/components/ui/use-toast";
 
 //* Components imports
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-
-//* Utils imports
-import { api } from "@/utils/public-api";
 
 //* Hooks imports
 import { useLogin, type Login, loginSchema } from "../_hooks";
@@ -45,6 +41,7 @@ import { useLogin, type Login, loginSchema } from "../_hooks";
 // }
 
 export function Form() {
+  const { toast } = useToast();
   const login = useLogin();
 
   const form = useForm<Login>({
@@ -60,14 +57,35 @@ export function Form() {
 
     // console.log(response);
 
-    login.mutate(data);
+    login.mutate(data, {
+      onSuccess: () => {
+        toast({
+          title: "Login success",
+          description: "You are now logged in",
+        });
+      },
+      onError: () => {
+        toast({
+          title: "Login error",
+          description: "An error occurred while trying to login",
+        });
+      },
+    });
   });
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-4 min-w-96">
       <div className="w-full flex flex-col">
         <Label htmlFor="email">Email</Label>
-        <Input {...form.register("email")} type="email" id="email" />
+        <Input
+          type="email"
+          id="email"
+          {
+          ...form.register("email", {
+            disabled: login.isPending,
+          })
+          }
+        />
         <span className="text-red-500 text-sm pt-1">
           {form.formState.errors.email?.message}
         </span>
@@ -75,13 +93,26 @@ export function Form() {
 
       <div className="w-full flex flex-col">
         <Label htmlFor="password">Password</Label>
-        <Input {...form.register("password")} type="password" id="password" />
+        <Input
+          type="password"
+          id="password"
+          {
+          ...form.register("password", {
+            disabled: login.isPending,
+          })
+          }
+        />
         <span className="text-red-500 text-sm pt-1">
           {form.formState.errors.password?.message}
         </span>
       </div>
 
-      <Button type="submit">Login</Button>
+      <Button
+        type="submit"
+        disabled={login.isPending}
+      >
+        Login
+      </Button>
     </form>
   );
 }
